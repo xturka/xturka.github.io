@@ -1,17 +1,26 @@
-async function getRedirectUrl() {
+async function getRedirectedURL() {
     try {
-        const proxyUrl = "https://api.allorigins.win/raw?url="; // Alternatif Proxy
-        const trackerUrl = "https://cutt.ly/le6JAfIP";
+        const proxyUrl = "https://api.allorigins.win/get?url=";
+        const trackerUrl = encodeURIComponent("https://cutt.ly/le6JAfIP");
 
-        const response = await fetch(proxyUrl + trackerUrl, {
-            method: "HEAD",
-            redirect: "follow",
-        });
+        const response = await fetch(proxyUrl + trackerUrl);
+        const data = await response.json();
 
-        console.log("Gerçek yönlendirme URL'si:", response.url);
+        console.log("Cutt.ly yönlendirme sayfası HTML içeriği:", data.contents);
 
-        document.getElementById("redirected-url").innerHTML = `<a href="${response.url}" target="_blank">${response.url}</a>`;
+        // Sayfanın HTML içeriğini DOM olarak işle
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, "text/html");
 
+        // Meta Refresh etiketini bul
+        const metaRefresh = doc.querySelector("meta[http-equiv='refresh']");
+        if (metaRefresh) {
+            const redirectUrl = metaRefresh.getAttribute("content").split("=")[1]; // URL'yi al
+            document.getElementById("redirected-url").innerHTML = `<a href="${redirectUrl}" target="_blank">${redirectUrl}</a>`;
+            return;
+        }
+
+        document.getElementById("redirected-url").innerText = "Yönlendirme adresi bulunamadı!";
     } catch (error) {
         console.error("Hata:", error);
         document.getElementById("redirected-url").innerText = "Bağlantı alınamadı!";
@@ -19,4 +28,4 @@ async function getRedirectUrl() {
 }
 
 // Sayfa yüklendiğinde çalıştır
-getRedirectUrl();
+getRedirectedURL();
