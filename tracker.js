@@ -1,37 +1,25 @@
-async function getAnnouncement() {
+async function getHeaders() {
     try {
-        const proxyUrl = "https://api.allorigins.win/get?url=";
-        const trackerUrl = encodeURIComponent("https://cutt.ly/le6JAfIP");
+        const response = await fetch("https://cutt.ly/le6JAfIP", { method: "HEAD" });
 
-        const response = await fetch(proxyUrl + trackerUrl);
-        const data = await response.json();  // JSON formatında cevabı al
+        // Headers'ları kontrol et
+        console.log("Headers:", response.headers);
 
-        // Gelen HTML içeriğini konsolda inceleyelim
-        console.log("Gelen içerik:", data.contents);
+        // Belirli bir başlığı almak için
+        const corsPolicy = response.headers.get("access-control-allow-origin");
 
-        // Sayfanın HTML içeriğini DOM olarak işle
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(data.contents, "text/html");
-
-        // İçeriği düz metin olarak al
-        const pageText = doc.body.innerText;
-
-        // "güncel adresimiz" içeren satırı bul
-        const regex = /üyemiz, güncel adresimiz (.+?) 'dur/i;
-        const match = pageText.match(regex);
-
-        if (match) {
-            const latestSite = match[1]; // Güncel site adresi
-            document.getElementById("announcement").innerText = `Güncel adres: ${latestSite}`;
+        if (corsPolicy) {
+            console.log("CORS Policy:", corsPolicy);
+            document.getElementById("cors-info").innerText = `CORS Policy: ${corsPolicy}`;
         } else {
-            document.getElementById("announcement").innerText = "Adres bulunamadı!";
+            document.getElementById("cors-info").innerText = "CORS başlığı alınamadı!";
         }
 
     } catch (error) {
         console.error("Hata:", error);
-        document.getElementById("announcement").innerText = "Bağlantı alınamadı!";
+        document.getElementById("cors-info").innerText = "Bağlantı hatası!";
     }
 }
 
 // Sayfa yüklendiğinde çalıştır
-getAnnouncement();
+getHeaders();
