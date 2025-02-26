@@ -1,25 +1,40 @@
-async function getHeaders() {
+async function getRedirectUrl() {
     try {
-        const response = await fetch("https://cutt.ly/le6JAfIP", { method: "HEAD" });
+        const proxyUrl = "https://api.allorigins.win/get?url="; // CORS Proxy
+        const trackerUrl = encodeURIComponent("https://cutt.ly/le6JAfIP");
 
-        // Headers'ları kontrol et
-        console.log("Headers:", response.headers);
+        const response = await fetch(proxyUrl + trackerUrl);
+        const data = await response.json();
 
-        // Belirli bir başlığı almak için
-        const corsPolicy = response.headers.get("access-control-allow-origin");
+        console.log("Cutt.ly yönlendirme sayfası HTML içeriği:", data.contents);
 
-        if (corsPolicy) {
-            console.log("CORS Policy:", corsPolicy);
-            document.getElementById("cors-info").innerText = `CORS Policy: ${corsPolicy}`;
-        } else {
-            document.getElementById("cors-info").innerText = "CORS başlığı alınamadı!";
+        // Sayfanın HTML içeriğini DOM olarak işle
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, "text/html");
+
+        // Eğer sayfada meta refresh ile yönlendirme varsa, onu al
+        const metaRefresh = doc.querySelector("meta[http-equiv='refresh']");
+        if (metaRefresh) {
+            const redirectUrl = metaRefresh.getAttribute("content").split("=")[1]; // URL'yi al
+            document.getElementById("redirected-url").innerHTML = `<a href="${redirectUrl}" target="_blank">${redirectUrl}</a>`;
+            return;
         }
+
+        // Eğer meta refresh yoksa, og:url içeriğine bak
+        const ogUrl = doc.querySelector("meta[property='og:url']");
+        if (ogUrl) {
+            const redirectUrl = ogUrl.getAttribute("content");
+            document.getElementById("redirected-url").innerHTML = `<a href="${redirectUrl}" target="_blank">${redirectUrl}</a>`;
+            return;
+        }
+
+        document.getElementById("redirected-url").innerText = "Yönlendirme adresi bulunamadı!";
 
     } catch (error) {
         console.error("Hata:", error);
-        document.getElementById("cors-info").innerText = "Bağlantı hatası!";
+        document.getElementById("redirected-url").innerText = "Bağlantı alınamadı!";
     }
 }
 
 // Sayfa yüklendiğinde çalıştır
-getHeaders();
+getRedirectUrl();
