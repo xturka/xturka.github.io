@@ -1,14 +1,13 @@
 async function getRedirectedURL() {
     try {
-        const proxyUrl = "https://api.allorigins.win/get?url="; // CORS Proxy
-        const trackerUrl = "https://cutt.ly/le6JAfIP";
+        const trackerUrl = "https://cutt.ly/le6JAfIP"; // Cutt.ly tracker URL'si
 
-        const response = await fetch(proxyUrl + trackerUrl, {
-            method: "HEAD", // HTTP başlıklarını al
-            redirect: "follow" // Yönlendirmeleri takip et
+        const response = await fetch(trackerUrl, {
+            method: "HEAD", // Sadece başlıkları kontrol et
+            redirect: "follow" // Yönlendirmeleri otomatik olarak takip et
         });
 
-        const redirectedURL = response.url; // Gerçek yönlendirme adresini al
+        const redirectedURL = response.url; // Gerçek yönlendirme URL'si
         console.log("Gerçek yönlendirme URL'si:", redirectedURL);
 
         // Sonucu HTML'e yaz
