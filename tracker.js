@@ -1,6 +1,6 @@
 async function getRedirectedURL() {
     try {
-        const proxyUrl = "https://api.allorigins.win/raw?url="; // CORS Proxy
+        const proxyUrl = "https://api.allorigins.win/get?url="; // CORS Proxy
         const trackerUrl = "https://cutt.ly/le6JAfIP";
 
         const response = await fetch(proxyUrl + trackerUrl, {
