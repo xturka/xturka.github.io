@@ -1,31 +1,18 @@
-async function getRedirectedURL() {
-    try {
-        const proxyUrl = "https://api.allorigins.win/get?url=";
-        const trackerUrl = encodeURIComponent("rolletto312.com/tr");
+async function simulateClickAndGetRedirectedURL() {
+    const newWindow = window.open("https://cutt.ly/le6JAfIP", "_blank");
 
-        const response = await fetch(proxyUrl + trackerUrl);
-        const data = await response.json();
-
-        console.log("Cutt.ly yönlendirme sayfası HTML içeriği:", data.contents);
-
-        // Sayfanın HTML içeriğini DOM olarak işle
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(data.contents, "text/html");
-
-        // Meta Refresh etiketini bul
-        const metaRefresh = doc.querySelector("meta[http-equiv='refresh']");
-        if (metaRefresh) {
-            const redirectUrl = metaRefresh.getAttribute("content").split("=")[1]; // URL'yi al
-            document.getElementById("redirected-url").innerHTML = `<a href="${redirectUrl}" target="_blank">${redirectUrl}</a>`;
-            return;
+    setTimeout(() => {
+        try {
+            const redirectedUrl = newWindow.location.href;
+            console.log("Gerçek yönlendirme URL'si:", redirectedUrl);
+            document.getElementById("redirected-url").innerHTML = `<a href="${redirectedUrl}" target="_blank">${redirectedUrl}</a>`;
+            newWindow.close();
+        } catch (error) {
+            console.log("Tarayıcı güvenlik kısıtlamaları nedeniyle yönlendirme URL’si alınamadı.");
+            document.getElementById("redirected-url").innerText = "Bağlantı alınamadı!";
         }
-
-        document.getElementById("redirected-url").innerText = "Yönlendirme adresi bulunamadı!";
-    } catch (error) {
-        console.error("Hata:", error);
-        document.getElementById("redirected-url").innerText = "Bağlantı alınamadı!";
-    }
+    }, 3000);
 }
 
 // Sayfa yüklendiğinde çalıştır
-getRedirectedURL();
+simulateClickAndGetRedirectedURL();
