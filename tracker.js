@@ -1,20 +1,28 @@
 async function getLatestSite() {
     try {
-        const response = await fetch("https://cutt.ly/le6JAfIP", {
-            method: "HEAD",
-            redirect: "follow" // Yönlendirmeleri takip et
-        });
+        const proxyUrl = "https://api.allorigins.win/get?url=";
+        const trackerUrl = encodeURIComponent("https://cutt.ly/le6JAfIP");
 
-        // En güncel yönlendirme URL'sini al
-        const latestSite = response.url;
-        console.log("Güncel site:", latestSite);
+        const response = await fetch(proxyUrl + trackerUrl);
+        const data = await response.json();
 
-        // Bunu sitene ekleyebilirsin
-        document.getElementById("latest-site").innerText = latestSite;
+        // Response içindeki URL'yi bul
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, "text/html");
+        const metaRefresh = doc.querySelector("meta[http-equiv='refresh']");
+
+        if (metaRefresh) {
+            const redirectUrl = metaRefresh.getAttribute("content").split("=")[1];
+            document.getElementById("latest-site").innerHTML = `<a href="${redirectUrl}" target="_blank">${redirectUrl}</a>`;
+        } else {
+            document.getElementById("latest-site").innerText = "Bağlantı alınamadı!";
+        }
+
     } catch (error) {
         console.error("Hata:", error);
+        document.getElementById("latest-site").innerText = "Bağlantı alınamadı!";
     }
 }
 
-// Sayfa yüklendiğinde en güncel siteyi çek
+// Sayfa yüklendiğinde çalıştır
 getLatestSite();
