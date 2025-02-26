@@ -1,7 +1,7 @@
 async function getRedirectedURL() {
     try {
         const proxyUrl = "https://api.allorigins.win/get?url=";
-        const trackerUrl = encodeURIComponent("https://cutt.ly/le6JAfIP");
+        const trackerUrl = encodeURIComponent("rolletto312.com/tr");
 
         const response = await fetch(proxyUrl + trackerUrl);
         const data = await response.json();
